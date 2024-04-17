@@ -1,3 +1,5 @@
 .venv
+
+/UiProject/__pycache__
 /versions/base_evolutionary_algorithm/__pycache__
 /versions/first_musical_algorithm/__pycache__
