@@ -1,0 +1,30 @@
+{
+    "inputs": {
+        "base":"int",
+        "bitLength":"int",
+        
+        "popSize":"int",
+        "pMutation":"float",
+        "pCross":"float",
+        "noOfCrossPoints":"int",
+        "fitnessEq":"str",
+        "fitnessType":"int",
+        "s":"float",
+        "generations":"int",
+        "runs":"int",
+        "curRun":"int",
+        "curGeneration":"int"
+    },
+    "outputs": [
+        "Gen",
+        "Best Genotype",
+        "Phenotype",
+        "Normal Phenotype",
+        "Best Fitness",
+        "Worst Genotype",
+        "Worst Fitness",
+        "Mean Fitness",
+        "Standard Deviation"
+    ]
+
+}
