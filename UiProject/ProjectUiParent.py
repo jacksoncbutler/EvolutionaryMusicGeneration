@@ -31,7 +31,7 @@ class ProjectUi(CTkFrame):
         self._running = False
         self._active = False
         self._params = {}
-        self._paramEntries = []
+        self._paramEntries = {}
         
         self.grid()
         rowWeights = (1,1,1,1,1,0)
@@ -80,7 +80,7 @@ class ProjectUi(CTkFrame):
             entry = CTkEntry(self._paramContainer, placeholder_text=value)
             entry.insert('0', value)
             entry.grid(row=count, column=1, sticky=N+S+E)
-            self._paramEntries.append(entry)
+            self._paramEntries[key] = entry
 
             count+=1
             
@@ -124,24 +124,32 @@ class ProjectUi(CTkFrame):
         self._update_entries()
             
     def _update_entries(self):
-        count = 0
         self._params = self._project.get_params()
-        tempParams = []
-        for value in self._params.values():
-            entry = self._paramEntries[count]
+        tempParams = {}
+        for key,value in self._params.items():
+            entry = self._paramEntries[key]
             
             entry.delete("0", END)
             entry.insert('0', value)
 
-            tempParams.append(entry)
+            tempParams[key] = entry
 
-            count+=1
         self._paramEntries = tempParams
+        del tempParams
+
+    def _update_entry(self, target):
+        value = eval(f'self._project.{target}')
+        print("VALUE", value)
+        entry = self._paramEntries[target]
+        entry.delete("0", END)
+        entry.insert('0', value)
+        self._paramEntries[target] = entry
+        self._params[target] = value
         
     def _update_project_params(self):
         count = 0
         for key,value in self._params.items():
-            entry = self._paramEntries[count].get()
+            entry = self._paramEntries[key].get()
             print(key,entry)
             if isinstance(value, int):
                 entry = int(entry)
@@ -151,6 +159,8 @@ class ProjectUi(CTkFrame):
                 entry = bool(entry)
             elif isinstance(value, str):
                 entry = str(entry)
+            elif isinstance(value, list):
+                entry = str(value).strip(' ').split(',')
             self._params[key] = entry
             count+= 1
         self._project.update_params(self._params)
@@ -171,8 +181,12 @@ class ProjectUi(CTkFrame):
     def run(self):
         self._outputBox.configure(state='normal')
         for gen_info in self._project.run():
+
             print(gen_info)
             self._outputBox.insert("0.0", f"| {self._project.curGeneration} {gen_info}\n")
+            self._update_entry('curGeneration')
+            self._update_entry('curRun')
+
             if not self._running:
                 break
         self._outputBox.insert("0.0", self._project.stringHeader)

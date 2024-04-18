@@ -77,7 +77,6 @@ class Main:
             if self.curRun == self.runs:
                 file.writelines("\n")
         
-
     def save_population_to_file(self, newParams, filePath):
         """ Helper function for UI """
         jsonObject = json.dumps(newParams, indent=4)
