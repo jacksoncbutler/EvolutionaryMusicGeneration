@@ -19,32 +19,5 @@ Current Ongoing Changes:
 
            ]]
 
-    - In order to adhere to Neo-Riemannian Theory
-        - Parsimonious if two pitches are shared
-            - Generalized parsimonious voice-leading requires
-                - 2 voices are shared
-                - 3rd voice proceeds by an interval no greater than twice the smallest
-                    available interval (not entire sure what this means)
-        - Available Transformations:
-            - Parsimonious transformations
-                - P: Parallel
-                - R: Relative
-                - L: Leading Tone
-            - Non-Parsimonious transformations
-                - S: Slide (opposite of P)
-                - N: Nebenverwandt
-                - H: Hexpole
-        - 3 Cycles that use two transformations, PL, RP, and RL
-            - PL and RP close rather quickly
-            - don't bother with RL
-
-        
-    - Need to update helpers(or individual)/mutate function
-        - MUTATE:
-        - Needs to know what type is being passed through
-        - Needs to know if type list if it 2D or not?
-    - Need to update helpers/randomBitstring function
-
-- Evaluate Fitness Function need to be updated to reflect changes to Genotype
-
-- Not much of this can be done until all required inputs have been decided...
+- Completed Changes
+    - Added real time updating to parameter curGeneration and curRun

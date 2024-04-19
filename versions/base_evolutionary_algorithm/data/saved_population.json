@@ -1,15 +1,1 @@
-{
-    "base": 2,
-    "bitLength": 30,
-    "popSize": 50,
-    "pMutation": 0.0333,
-    "pCross": 0.6,
-    "noOfCrossPoints": 1,
-    "fitnessEq": "z**10",
-    "fitnessType": 0,
-    "s": 1.5,
-    "generations": 30,
-    "runs": 1,
-    "curRun": 1,
-    "curGeneration": 30
-}
+null
