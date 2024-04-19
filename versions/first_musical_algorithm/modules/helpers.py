@@ -47,6 +47,8 @@ def random_binary_string(length:int, base:int) -> list:
 def normalize(number:int, total):
     return float(number/(total))
 
+
+
 if __name__ == '__main__':
     pass
     

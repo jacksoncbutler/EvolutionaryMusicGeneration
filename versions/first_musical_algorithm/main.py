@@ -77,27 +77,13 @@ class Main:
             if self.curRun == self.runs:
                 file.writelines("\n")
         
-    def save_population_to_file(self, filePath):
+    def save_population_to_file(self, newParams, filePath):
         """ Helper function for UI """
-
-        jsonObject = json.dumps(self._curPopulation.genotypes if isinstance(self._curPopulation,Population) else self._curPopulation , indent=4)
-        with open(filePath, 'w') as file:
-            file.write(jsonObject)
-
-    def save_params_to_file(self, newParams, filePath):
         jsonObject = json.dumps(newParams, indent=4)
         with open(filePath, 'w') as file:
             file.write(jsonObject)
 
     def load_population_from_file(self, filePath):
-        """ Helper function for UI """
-        with open(filePath, 'r') as file:
-            population = json.load(file)
-            self._curPopulation = population
-        if isinstance(self._curPopulation,list):
-            self.load_population_from_self(loadPop=True)
-        
-    def load_params_from_file(self, filePath):
         """ Helper function for UI """
         with open(filePath, 'r') as file:
             newParams = json.load(file)
@@ -114,7 +100,6 @@ class Main:
             self._s = newParams["s"]
             self.curRun = newParams["curRun"]
             self.curGeneration = newParams["curGeneration"]
-
     
     def update_params(self, newParams):
         """ Helper funciton for UI """
@@ -157,16 +142,7 @@ class Main:
         """ Helper function for UI """
         if loadPop:
             print("load")
-            self._curPopulation = Population(self._base, 
-                                             self._bitLength, 
-                                             self._popSize, 
-                                             self._pMutation, 
-                                             self._pCross, 
-                                             self._noOfCrossPoints, 
-                                             self._fitnessEq, 
-                                             genPopulation=genPop, 
-                                             loadFromGenotype=(self._curPopulation.genotypes if isinstance(self._curPopulation,Population) else self._curPopulation if isinstance(self._curPopulation,list) else None),
-                                             fitnessType=self._fitnessType, s=self._s)
+            self._curPopulation = Population(self._base, self._bitLength, self._popSize, self._pMutation, self._pCross, self._noOfCrossPoints, self._fitnessEq, genPopulation=genPop, loadFromGenotype=self._curPopulation.genotypes, fitnessType=self._fitnessType, s=self._s)
         else:
             print("gen")
             self._curPopulation = Population(self._base, self._bitLength, self._popSize, self._pMutation, self._pCross, self._noOfCrossPoints, self._fitnessEq, genPopulation=genPop, fitnessType=self._fitnessType, s=self._s)
