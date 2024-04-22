@@ -5,8 +5,8 @@ Contains a class for the population of a genetic algorithm
 '''
 
 
-from .Individual import Individual
-from .helpers import crossover, random_binary_string, normalize
+from Individual import Individual
+from helpers import crossover, random_binary_string, normalize
 from statistics import mean, stdev
 import random
 import math
@@ -40,22 +40,6 @@ class Population:
         # genotype, phenotype, normalPhenotype, fitness, worstGenotype,  = self.results
         return '| {} | {:10} | {:16f} | {:.5f} | {} | {:.5f} | {:.3f} | {:.3f} |'.format(*self.results)
     
-    @property
-    def results(self):
-        """
-        Returns best performing bitString in the current generation as a list
-        return: list
-        """ 
-        stats = self.get_stats()
-        return (self.population[-1].genotype, self.population[-1].phenotype, normalize(self.population[-1].phenotype, (self._base**self._bitLength)-1), self.population[-1].fitness, self.population[0].genotype, self.population[0].fitness, stats[0], stats[1])
-
-    @property
-    def genotypes(self):
-        genotypes = []
-        for individual in self.population:
-            genotypes.append(individual.genotype)
-        return genotypes
-    
     def gen_population(self, genotypes = None):
         if isinstance(genotypes, list):
             for individual in genotypes:
@@ -65,26 +49,6 @@ class Population:
                 self.populate_Population(random_binary_string(self._bitLength, self._base), mutate=False)
         self.evaluate_fitness()
     
-            
-    def get_info(self):        
-        """ Helper function for UI, RETURNS dict with significant information for loading same population again"""
-        return {"base": self._base,
-                "bitLength": self._bitLength,
-                "popSize": self._popSize,
-                "pMutation": self._pMutation,
-                "pCross": self._pCross,
-                "noOfCrossPoints": self._noOfCrossPoints,
-                "fitnessEq": self._fitnessEq,
-                "generation": 0,
-                "genotypes": self.genotypes}
-    
-
-    def get_stats(self):
-        averageFitness = mean([individual.fitness for individual in self.population])
-        stDevFitness = stdev([individual.fitness for individual in self.population])
-
-        return (averageFitness, stDevFitness)
-        
 
     def populate_Population(self, individual, mutate=True, parent1=None, parent2=None):
         """
@@ -193,34 +157,13 @@ if __name__ == '__main__':
     # Basic test code, for more in depth testing use the test.py file
 
     generations = 50
-    pop = Population(base=2, bitLength=30, popSize=30, pMutation=0.0333, pCross=0.6, fitnessEq='z**10', genPopulation=True)
+    pop = Population(base=2, bitLength=30, popSize=30, pMutation=0.0333, pCross=0.6, fitnessEq='z**10', noOfCrossPoints=1, genPopulation=True)
     print(pop)
     genCount = 1
     while genCount < generations:
         pop = pop.next_generation()
         print(pop)
         genCount += 1
-    
-
-    generations = 50
-    pop = Population(base=2, bitLength=30, popSize=30, pMutation=0.0333, pCross=0.6, fitnessEq='(-112/3)*z**4+72*z**3-(131/3)*z**2+9*z', genPopulation=True)
-    print(pop)
-    genCount = 1
-    while genCount < generations:
-        pop = pop.next_generation()
-        print(pop)
-        genCount += 1
-    
-    
-    generations = 50
-    pop = Population(base=2, bitLength=30, popSize=30, pMutation=0.0333, pCross=0.6, fitnessEq='2*math.cos(z)+math.sin(2*z)', genPopulation=True)
-    print(pop)
-    genCount = 1
-    while genCount < generations:
-        pop = pop.next_generation()
-        print(pop)
-        genCount += 1
-    print(pop)
     
     
     
