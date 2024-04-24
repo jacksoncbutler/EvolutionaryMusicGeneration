@@ -13,11 +13,16 @@ class Individual:
     def __init__(self, genotype:list, base:int, pMutation, parents:tuple=('None', 'None')):
         self._base = base
         self._genotype = genotype  # changed to list (2d array)
+        """
+        [
+            ['R','L','H']
+        ]
+        
+        """
         self._pMutation = pMutation
         self._parents = parents
         self._fitnessPercentage = 0
         self.fitness = 0
-
 
     @property
     def genotype(self):

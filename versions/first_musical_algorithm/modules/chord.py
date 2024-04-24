@@ -2,7 +2,8 @@ from note import Note
 
 
 class Chord:
-    translate = {'R':'R', 'P':'P', 'L':'L', 'N':'LPRP'}
+
+    translate = {'R':'R', 'P':'P', 'L':'L', 'H':'PLP', 'S':'LPR', 'N':'RLP', 'F':'LR', 'M':'RL'}
 
     def __init__(self, notes:tuple=(1,3,5), flats:tuple=('natural', 'natural', 'natural'), mod:str='M'):
 
@@ -13,9 +14,9 @@ class Chord:
     def fill_operations(self, transitions:list):
         for item in transitions:
             self.operations.append([i for i in Chord.translate[item]])
-            # print(self.operations)
     
     def perform_operations(self):
+        print(self)
         for operations in self.operations:
             for item in operations:
                 if item == 'R':
@@ -27,7 +28,7 @@ class Chord:
                 else:
                     print(item)
                     raise ValueError("Invalid tranformation in class Chord")
-                # print(item, self)
+                print(item, self)
             
     def shift(self, direction:int):
         """
@@ -53,7 +54,6 @@ class Chord:
                     self.notes[num] = self.notes[index]
                 else:
                     self.notes[num] = holdVar
-                    
     
     def L(self):
         if self.mod == 'M':
@@ -91,7 +91,7 @@ class Chord:
 if __name__ == '__main__':
     chord = Chord()
     # chord.fill_operations(['L','P', 'R'])
-    chord.fill_operations(['N'])
+    chord.fill_operations(['F'])
 
     chord.perform_operations()
     print(chord)

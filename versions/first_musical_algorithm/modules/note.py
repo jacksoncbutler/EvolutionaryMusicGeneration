@@ -50,8 +50,6 @@ class Note:
 
 
 
-
-
 if __name__ == '__main__':
     x = Note(1)
 
