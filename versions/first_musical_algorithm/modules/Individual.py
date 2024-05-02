@@ -9,15 +9,17 @@ import random
 
 
 class Individual:
+
+    translate = {'R':'R', 'P':'P', 'L':'L', 'H':'PLP', 'S':'LPR', 'N':'RLP', 'F':'LR', 'M':'RL'}
     
     def __init__(self, genotype:list, base:int, pMutation, parents:tuple=('None', 'None')):
         self._base = base
         self._genotype = genotype  # changed to list (2d array)
         """
         [
-            ['R','L','H']
+            ['R','L','H'],  # Transformations
+            [1,1,1,],       # Time
         ]
-        
         """
         self._pMutation = pMutation
         self._parents = parents
@@ -43,20 +45,17 @@ class Individual:
         Tries to mutate each bit in genotype
         This method only runs on creation of Individual
         """
-        # self._genotype = ''.join(
-        #     [str(int(not(int(self._genotype[mutationPoint]))))  # inverted point appended to list if below statement is true
-        #         if random.random() <= self._pMutation else self._genotype[mutationPoint]  # if random value is within mutation range ^, else append same value to list
-        #         for mutationPoint in range(len(self._genotype)) # iterate through length of genotyope
-        #     ]
-        # )
-        
 
-        self._genotype = ''.join(
-            [str(random.randrange(0,self._base))  # inverted point appended to list if below statement is true
-                if random.random() <= self._pMutation else self._genotype[mutationPoint]  # if random value is within mutation range ^, else append same value to list
-                for mutationPoint in range(len(self._genotype)) # iterate through length of genotyope
-            ]
-        )
+        # Mutate Transformations
+        possibleTransformations = Individual.translate.keys()
+        genotypeTransformation  = [random.choice(possibleTransformations) if random.random() <= self._pMutation else self._genotype[0][i] for i in self._genotype[0]]
+
+        genotypeTime            = [random.randrange(0,400)/100 if random.random() <= self._pMutation else self._genotype[1][i] fro i in self._genotype[1]]
+
+        self._genotype[0] = genotypeTransformation
+        self._genotype[1] = genotypeTime
+                
+
     
     
 if __name__ == '__main__':
