@@ -1,9 +1,8 @@
 from note import Note
-
+from helpers import get_translations
 
 class Chord:
 
-    translate = {'R':'R', 'P':'P', 'L':'L', 'H':'PLP', 'S':'LPR', 'N':'RLP', 'F':'LR', 'M':'RL'}
     num_to_chord = ['_', 'C', 'D','E','F','G','A','B']
 
     def __init__(self, notes:tuple=(1,3,5), flats:tuple=('natural', 'natural', 'natural'), mod:str='M'):
@@ -14,13 +13,12 @@ class Chord:
 
     def fill_operations(self, transitions:list):
         for item in transitions:
-            self.operations.append([i for i in Chord.translate[item]])
+            self.operations.append([i for i in get_translations()[item]])
     
     def perform_operations(self):
-        print(self)
-        print(self.operations)
-        while len(self.operations)>0:
-            operations = self.operations.pop(0)
+        while len(self.operations) > 0:
+            operations = self.operations.pop()
+
             for item in operations:
                 if item == 'R':
                     self.R()
@@ -32,9 +30,7 @@ class Chord:
                     print(item)
                     raise ValueError("Invalid tranformation in class Chord")
                 # print(item, self)
-                
-            print(operations, self)
-            # self.operations.pop(0)
+            yield str(self)
             
     def shift(self, direction:int):
         """

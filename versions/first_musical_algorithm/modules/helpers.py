@@ -4,51 +4,78 @@ Pledged
 Contains useful helper functions for use in genetic algorithms
 '''
 
-from http.client import MULTI_STATUS
+import copy
 import random
+# from individual import Individual
 
-def crossover(parent1:str, parent2:str, noOfCrossPoints:int):
-    
-    if len(parent1) == len(parent2):
-        if noOfCrossPoints <= len(parent1)-1:
-            
-            crossingPoints = sorted([*random.sample(range(0,len(parent1)-1),noOfCrossPoints), len(parent1)])
-            child1 = ''
-            child2 = ''
-            prev = 0
+def crossover(genotype1:list, genotype2:list):
 
-            for crossingIndex in range(len(crossingPoints)):
-                
-                crossingPoint = crossingPoints[crossingIndex]
-                
-                if crossingIndex % 2 == 0:
-                    
-                    child1 += parent1[prev:crossingPoint]
-                    child2 += parent2[prev:crossingPoint]
-                    
-                else:
-                    
-                    child1 += parent2[prev:crossingPoint]
-                    child2 += parent1[prev:crossingPoint]
-                    
-                prev = crossingPoint
+    for section in range(len(genotype1)):
+        diff = len(genotype1[section]) - len(genotype2[section])
+        # print('section',genotype1[section])
+       
+
+        if diff > 0:
+            crossingPoint = random.randrange(len(genotype2))
+            tempGeno = copy.deepcopy(genotype1)
+            diff = abs(diff)
+
             
+            genotype1[section] = [*(tempGeno[section][:crossingPoint+diff]), *(genotype2[section][crossingPoint:])]
+            genotype2[section] = [*(genotype2[section][:crossingPoint]), *(tempGeno[section][crossingPoint+diff:])]
+
+
+        elif diff < 0:
+            crossingPoint = random.randrange(len(genotype1))
+            tempGeno = copy.deepcopy(genotype1)
+            diff = abs(diff)
+
+
+            genotype1[section] = [*(tempGeno[section][:crossingPoint]), *(genotype2[section][crossingPoint+diff:])]
+            genotype2[section] = [*(genotype2[section][:crossingPoint+diff]), *(tempGeno[section][crossingPoint:])]
+
         else:
-            raise ValueError("noOfCrossPoints exceeds the length of input strings")
-    else:
-        raise ValueError("Parent1 and Parent2 muse be of the same length")
+            crossingPoint = random.randrange(len(genotype1))
+            tempGeno = copy.deepcopy(genotype1)
+
+            genotype1[section] = [*(tempGeno[section][:crossingPoint]), *(genotype2[section][crossingPoint:])]
+            genotype2[section] = [*(genotype2[section][:crossingPoint]), *(tempGeno[section][crossingPoint:])]
+
     
-    return child1, child2
+    return genotype1, genotype2
 
-def random_binary_string(length:int, base:int) -> list:
+
+def get_translations():
+    return {'R':'R', 'P':'P', 'L':'L', 'H':'PLP', 'S':'LPR', 'N':'RLP', 'F':'LR', 'M':'RL'}
+
+def generate_genotype(length:int, maxFloat:int=4) -> list:
+    return [random_transformations_list(length), random_integer_list(length, maxFloat)]
+
+
+def random_integer_list(length:int, base:int=9) -> list:
     # random.seed(42)
-    return ''.join([str(random.randrange(0,base)) for _ in range(length)])
+    return [random.randrange(0,base) for _ in range(length)]
 
-def normalize(number:int, total):
+def random_float_list(length:int, max:int) -> list:
+    # random.seed(42)
+    return [round(random.randrange(0,max*100) / 100, 1) for _ in range(length)]
+
+def random_transformations_list(length:int) -> list:
+    # random.seed(42)
+    keys = list(get_translations().keys())
+    return [random.choice(keys) for _ in range(length)]
+
+
+def normalize(number:int, total): 
     return float(number/(total))
 
 
-
 if __name__ == '__main__':
-    pass
+    print(get_translations()['N'])
+    print(random_transformations_list(4))
+    print(random_integer_list(4, 10))
+
+    
+
+
     
