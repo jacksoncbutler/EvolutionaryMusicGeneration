@@ -1,9 +1,9 @@
 from note import Note
-
+from helpers import get_translations
 
 class Chord:
 
-    translate = {'R':'R', 'P':'P', 'L':'L', 'H':'PLP', 'S':'LPR', 'N':'RLP', 'F':'LR', 'M':'RL'}
+    chordTranslation = ['_', 'C', 'D', 'E', 'F', 'G', 'A', 'B']
 
     def __init__(self, notes:tuple=(1,3,5), flats:tuple=('natural', 'natural', 'natural'), mod:str='M'):
 
@@ -13,11 +13,12 @@ class Chord:
 
     def fill_operations(self, transitions:list):
         for item in transitions:
-            self.operations.append([i for i in Chord.translate[item]])
+            self.operations.append([i for i in get_translations()[item]])
     
     def perform_operations(self):
-        print(self)
-        for operations in self.operations:
+        # print(self)
+        while len(self.operations) > 0:
+            operations = self.operations.pop()
             for item in operations:
                 if item == 'R':
                     self.R()
@@ -28,7 +29,9 @@ class Chord:
                 else:
                     print(item)
                     raise ValueError("Invalid tranformation in class Chord")
-                print(item, self)
+                # print(item, self)
+            yield self.chordStr()
+
             
     def shift(self, direction:int):
         """
@@ -71,7 +74,7 @@ class Chord:
             self.shift(-1)
             self.mod = 'm'
         else:
-            self.notes[2].flat(2)
+            self.notes[0].flat(2)
             self.shift(1)
             self.mod = 'M'
 
@@ -85,6 +88,9 @@ class Chord:
 
     def __str__(self):
         return f'{[str(note) for note in self.notes]}, {self.mod}'
+    
+    def chordStr(self):
+        return f'{Chord.chordTranslation[self.notes[0].value]}{self.mod}'
 
 
 
