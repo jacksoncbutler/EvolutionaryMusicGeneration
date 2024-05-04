@@ -3,7 +3,7 @@ from helpers import get_translations
 
 class Chord:
 
-    chordTranslation = ['_', 'C', 'D', 'E', 'F', 'G', 'A', 'B']
+    num_to_chord = ['_', 'C', 'D','E','F','G','A','B']
 
     def __init__(self, notes:tuple=(1,3,5), flats:tuple=('natural', 'natural', 'natural'), mod:str='M'):
 
@@ -16,9 +16,9 @@ class Chord:
             self.operations.append([i for i in get_translations()[item]])
     
     def perform_operations(self):
-        # print(self)
         while len(self.operations) > 0:
             operations = self.operations.pop()
+
             for item in operations:
                 if item == 'R':
                     self.R()
@@ -30,8 +30,7 @@ class Chord:
                     print(item)
                     raise ValueError("Invalid tranformation in class Chord")
                 # print(item, self)
-            yield self.chordStr()
-
+            yield str(self)
             
     def shift(self, direction:int):
         """
@@ -86,11 +85,11 @@ class Chord:
             self.notes[1].sharp(1)
             self.mod = 'M'
 
+    def chord_string(self):
+        return f'{Chord.num_to_chord[self.notes[0].value]}{self.mod}'
+
     def __str__(self):
-        return f'{[str(note) for note in self.notes]}, {self.mod}'
-    
-    def chordStr(self):
-        return f'{Chord.chordTranslation[self.notes[0].value]}{self.mod}'
+        return f'{[str(note) for note in self.notes]}, {self.mod}, Chord: {self.chord_string()}'
 
 
 

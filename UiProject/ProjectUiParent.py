@@ -163,7 +163,7 @@ class ProjectUi(CTkFrame):
 
     def _update_entry(self, target):
         value = eval(f'self._project.{target}')
-        print("VALUE", value)
+        # print("VALUE", value)
         entry = self._paramEntries[target]
         entry.delete("0", END)
         entry.insert('0', value)
@@ -174,7 +174,7 @@ class ProjectUi(CTkFrame):
         count = 0
         for key,value in self._params.items():
             entry = self._paramEntries[key].get()
-            print(key,entry)
+            # print(key,entry)
             if isinstance(value, int):
                 entry = int(entry)
             elif isinstance(value, float):

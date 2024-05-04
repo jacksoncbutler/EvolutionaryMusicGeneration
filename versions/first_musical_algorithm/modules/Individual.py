@@ -78,5 +78,4 @@ if __name__ == '__main__':
     print(indi1)
     print(indi2)
     print(crossover(indi1.genotype, indi2.genotype))
- 
     

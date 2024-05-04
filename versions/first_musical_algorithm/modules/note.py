@@ -37,7 +37,7 @@ class Note:
                 self.value = 1
                 if (self.octave + 1) in [i for i in range(*self.octaveRange)]:
                     self.octave += 1
-            elif self.value == 3:
+            elif self.value == 3 and self.mod == 'natural':
                 self.value += 1
             elif self.mod == 'natural':
                 self.value += 1
