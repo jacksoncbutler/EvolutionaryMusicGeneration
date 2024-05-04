@@ -6,7 +6,7 @@ Contains a class for the individual of a population
 
 
 import random
-
+from chord import Chord
 
 class Individual:
 
@@ -33,12 +33,12 @@ class Individual:
         """
         return self._genotype
     
-    @property
-    def phenotype(self):
-        """
-        Returns bit string genotype as an int
-        """
-        return int(self._genotype, self._base)
+    # @property
+    # def phenotype(self):
+    #     """
+    #     Returns bit string genotype as an int
+    #     """
+    #     return int(self._genotype, self._base)
     
     def mutate(self):  # need to rewrite this to accomadate for new list Genotype
         """
@@ -47,10 +47,10 @@ class Individual:
         """
 
         # Mutate Transformations
-        possibleTransformations = Individual.translate.keys()
-        genotypeTransformation  = [random.choice(possibleTransformations) if random.random() <= self._pMutation else self._genotype[0][i] for i in self._genotype[0]]
+        possibleTransformations = list(Individual.translate.keys())
 
-        genotypeTime            = [random.randrange(0,400)/100 if random.random() <= self._pMutation else self._genotype[1][i] fro i in self._genotype[1]]
+        genotypeTransformation  = [random.choice(possibleTransformations) if random.random() <= self._pMutation else self._genotype[0][i] for i in range(len(self._genotype[0]))]
+        genotypeTime            = [random.randrange(0,400)/100 if random.random() <= self._pMutation else self._genotype[1][i] for i in range(len(self._genotype[1]))]
 
         self._genotype[0] = genotypeTransformation
         self._genotype[1] = genotypeTime
@@ -60,8 +60,19 @@ class Individual:
     
 if __name__ == '__main__':
     # Minor test code
-    indi = Individual('0011101')
-    indi.mutate(0.1)
-    print(indi.genotype)
- 
+    chord = Chord()
+    indi = Individual([['R','P','L'], [1, 1, 1,]], base=2, pMutation=0.5)
+    indi.mutate()
+    # print(indi.genotype)
+
+    chord.fill_operations(indi.genotype[0])
+
+    chord.perform_operations()
+    print(())
+    indi.mutate()
+    # print("geno:",indi.genotype)
+
+    chord.fill_operations(indi.genotype[0])
+
+    chord.perform_operations()
     
