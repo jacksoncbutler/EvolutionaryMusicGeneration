@@ -6,7 +6,11 @@ Contains useful helper functions for use in genetic algorithms
 
 import copy
 import random
-# from individual import Individual
+import os
+from midiutil import MIDIFile
+import pygame
+
+
 
 def crossover(genotype1:list, genotype2:list):
 
@@ -14,7 +18,6 @@ def crossover(genotype1:list, genotype2:list):
         diff = len(genotype1[section]) - len(genotype2[section])
         # print('section',genotype1[section])
        
-
         if diff > 0:
             crossingPoint = random.randrange(len(genotype2))
             tempGeno = copy.deepcopy(genotype1)
@@ -49,7 +52,7 @@ def get_translations():
     return {'R':'R', 'P':'P', 'L':'L', 'H':'PLP', 'S':'LPR', 'N':'RLP', 'F':'LR', 'M':'RL'}
 
 def generate_genotype(length:int, maxFloat:int=4) -> list:
-    return [random_transformations_list(length), random_integer_list(length, maxFloat)]
+    return [random_transformations_list(length), random_float_list(length, maxFloat)]
 
 
 def random_integer_list(length:int, base:int=9) -> list:
@@ -70,11 +73,49 @@ def normalize(number:int, total):
     return float(number/(total))
 
 
+def output_to_midi(chords, midiFile):
+    # degrees  = [60, 62, 64, 65, 67, 69, 71, 72] # MIDI note number
+    track    = 0
+    channel  = 0
+    time     = 0   # In beats
+    # duration = .5   # In beats
+    tempo    = 60  # In BPM
+    volume   = 100 # 0-127, as per the MIDI standard
+
+    MyMIDI = MIDIFile(1) # One track, defaults to format 1 (tempo track
+                        # automatically created)
+    MyMIDI.addTempo(track,time, tempo)
+    for chord, duration in chords: # assumes len(genotype[0]) == len(genotype[1])
+        for note in chord:
+            print(note, end=", ")
+            MyMIDI.addNote(track, channel, note, time, duration, volume)
+        time = time + duration
+        print()
+
+    with open(midiFile, "wb") as output_file:
+        MyMIDI.writeFile(output_file)
+
+def play_midi(midiFile):
+    freq = 44100                               # audio CD quality
+    bitsize = -16                              # unsigned 16 bit
+    channels = 2                               # 1 is mono, 2 is stereo
+    buffer = 1024                              # number of samples
+    clock = pygame.time.Clock()
+    pygame.mixer.init(freq, bitsize, channels, buffer)
+    pygame.mixer.music.set_volume(0.8)         # volume 0 to 1.0
+
+    pygame.mixer.music.load(midiFile)         # read the midi file
+    pygame.mixer.music.play()                  # play the music
+    while pygame.mixer.music.get_busy():       # check if playback has finished
+        clock.tick(30)
+
+
 if __name__ == '__main__':
     print(get_translations()['N'])
     print(random_transformations_list(4))
     print(random_integer_list(4, 10))
-
+    output_to_midi("foo", "major-scale.mid")
+    play_midi("major-scale.mid")
     
 
 

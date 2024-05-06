@@ -3,6 +3,7 @@
 class Note:
 
     translate = {'C': 1, 'D': 2, 'E': 3, 'F': 4, 'G':5, 'A': 6, 'B': 7}
+    midi_note_map = {1:0, 2:2, 3:4, 4:5, 5:7, 6:9, 7:11}
 
     def __init__(self, note:int|str=1, mod:str='natural', octave:int=4, octaveRange:tuple=(0,8)):
         self.mod = mod.lower()  # Can be 'natural' or 'flat'
@@ -45,20 +46,38 @@ class Note:
             else:
                 self.mod = 'natural'
 
+    def as_midi(self):
+        return ((Note.midi_note_map[self.value] ) % 12) + (self.octave *12) - (1 if self.mod=="flat" else 0)
+
     def __str__(self):
         return f'{self.value}, {self.mod}'
-
-
+    
 
 if __name__ == '__main__':
     x = Note(1)
-
+    print(x.as_midi())
     x.sharp()
-    print(x)
-    x.flat()
-    print(x)
-    x.sharp(2)
-    print(x)
+    print(x.as_midi())
+    x.sharp()
+    print(x.as_midi())
+    x.sharp()
+    print(x.as_midi())
+    x.sharp()
+    print(x.as_midi())
+    x.sharp()
+    print(x.as_midi())
+    x.sharp()
+    print(x.as_midi())
+    x.sharp()
+    print(x.as_midi())
+    x.sharp()
+    print(x.as_midi())
+    x.sharp()
+    print(x.as_midi())
+    x.sharp()
+    print(x.as_midi())
+    x.sharp()
+    print(x.as_midi())
             
 
 

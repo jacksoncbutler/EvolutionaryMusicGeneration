@@ -30,7 +30,7 @@ class Chord:
                     print(item)
                     raise ValueError("Invalid tranformation in class Chord")
                 # print(item, self)
-            yield str(self)
+            yield self
             
     def shift(self, direction:int):
         """
@@ -87,6 +87,9 @@ class Chord:
 
     def chord_string(self):
         return f'{Chord.num_to_chord[self.notes[0].value]}{self.mod}'
+    
+    def as_midi(self):
+        return [note.as_midi() for note in self.notes]
 
     def __str__(self):
         return f'{[str(note) for note in self.notes]}, {self.mod}, Chord: {self.chord_string()}'

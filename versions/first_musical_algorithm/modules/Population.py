@@ -6,7 +6,7 @@ Contains a class for the population of a genetic algorithm
 
 
 from individual import Individual
-from helpers import crossover, generate_genotype, normalize
+from helpers import crossover, generate_genotype, normalize, output_to_midi, play_midi
 from statistics import mean, stdev
 from chord import Chord
 import random
@@ -132,13 +132,16 @@ class Population:
                 
             self._fitnessWheel.append(normalizedSum)
 
-            
-        count = -1
-        self._chord.fill_operations(self.population[-1].transforms)
-        self.population[-1].transforms
+
+    def save_measure(self, measure):
+        count = 0
+        self._chord.fill_operations(measure.transforms)
         for chord in self._chord.perform_operations():
+            self._chords.append((chord.as_midi(), measure.times[count]))
             count += 1
-            self._chords.append((chord, self.population[-1].times[count]))
+            # self._chords.append((chord.chord_string()))
+
+
 
     def next_generation(self):
         """
@@ -146,6 +149,8 @@ class Population:
         Roulette Wheel then generates children of selected parents newPopulation
         return: class Population
         """
+        self.save_measure(self.population[-1])
+
         newPopulation = Population(self._popSize, self._genotypeLength, self._maxNoteLength, self._pTransformMutation, self._pTimeMutation, self._pTransformCross, self._pTimeCross, self._fitnessEq, fitnessType=self._fitnessType, s=self._s, chord=self._chord, chords=self._chords)
 
         # Select Parents (roulette wheel)
@@ -191,7 +196,9 @@ class Population:
         """
         return (self.population[-1].genotype, self.population[-1].fitness, self.population[0].genotype, self.population[0].fitness)
 
-
+    @property
+    def chords(self):
+        return self._chords
     
         
     
@@ -199,7 +206,7 @@ if __name__ == '__main__':
     # Basic test code, for more in depth testing use the test.py file
 
     generations = 10
-    pop = Population(100, 4 ,4,0.25, 0.25, 0.5, 0.5, fitnessEq='z**10', genPopulation=True)
+    pop = Population(100, 4 ,1,0.25, 0.25, 0.5, 0.5, fitnessEq='z**10', genPopulation=True)
     print(pop)
     genCount = 1
     while genCount < generations:
@@ -208,7 +215,9 @@ if __name__ == '__main__':
         # print(pop._chords[-4:])
         genCount += 1
     
-    print(pop._chords)
+    
+    output_to_midi(pop.chords, "midi_file.mid")
+    play_midi("midi_file.mid")
     
     
     
