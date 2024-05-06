@@ -49,3 +49,12 @@ Current Ongoing Changes:
 - Evaluate Fitness Function need to be updated to reflect changes to Genotype
 
 - Not much of this can be done until all required inputs have been decided...
+
+
+Based on Key
+Tonics: I, VI, Vb, IIIb # prolong tonic or go to sub
+Subdominant: II, VII, VIb, IV # if sub go to sub or dom
+Dominant: VI, III, IIb, IIVb # if dom go to dom or tonic
+
+   P   R       L
+T -> i -> IIIb -> iv

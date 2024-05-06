@@ -56,7 +56,7 @@ class Individual:
         genotypeTransformation  = [random.choice(possibleTransformations) if random.random() <= self._pTransformMutation else self._genotype[0][i] for i in range(len(self._genotype[0]))]
 
         # Need to do something about this INTEGER or FLOAT
-        genotypeTime            = [random.randrange(0,400)/100 if random.random() <= self._pTimeMutation else self._genotype[1][i] for i in range(len(self._genotype[1]))]
+        genotypeTime            = [random.randrange(0,100)/100 if random.random() <= self._pTimeMutation else self._genotype[1][i] for i in range(len(self._genotype[1]))]
 
         self._genotype[0] = genotypeTransformation
         self._genotype[1] = genotypeTime

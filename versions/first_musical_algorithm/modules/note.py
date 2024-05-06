@@ -47,7 +47,7 @@ class Note:
                 self.mod = 'natural'
 
     def as_midi(self):
-        return ((Note.midi_note_map[self.value] ) % 12) + (self.octave *12) - (1 if self.mod=="flat" else 0)
+        return max(((Note.midi_note_map[self.value] ) % 12) + (self.octave *12) - (1 if self.mod=="flat" else 0), 0)
 
     def __str__(self):
         return f'{self.value}, {self.mod}'

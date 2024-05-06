@@ -49,7 +49,7 @@ def crossover(genotype1:list, genotype2:list):
 
 
 def get_translations():
-    return {'R':'R', 'P':'P', 'L':'L', 'H':'PLP', 'S':'LPR', 'N':'RLP', 'F':'LR', 'M':'RL'}
+    return {'R':'R', 'P':'P', 'L':'L', 'H':'PLR', 'S':'LPRP', 'N':'RLP', 'F':'PL', 'M':'RL'}
 
 def generate_genotype(length:int, maxFloat:int=4) -> list:
     return [random_transformations_list(length), random_float_list(length, maxFloat)]
@@ -73,7 +73,7 @@ def normalize(number:int, total):
     return float(number/(total))
 
 
-def output_to_midi(chords, midiFile):
+def output_to_midi(chords, midiFile, apregiate=False):
     # degrees  = [60, 62, 64, 65, 67, 69, 71, 72] # MIDI note number
     track    = 0
     channel  = 0
@@ -87,10 +87,11 @@ def output_to_midi(chords, midiFile):
     MyMIDI.addTempo(track,time, tempo)
     for chord, duration in chords: # assumes len(genotype[0]) == len(genotype[1])
         for note in chord:
-            print(note, end=", ")
+            # print(note, end=", ")
             MyMIDI.addNote(track, channel, note, time, duration, volume)
-        time = time + duration
-        print()
+            time += .1
+        time += .5
+        # print()
 
     with open(midiFile, "wb") as output_file:
         MyMIDI.writeFile(output_file)
@@ -107,7 +108,7 @@ def play_midi(midiFile):
     pygame.mixer.music.load(midiFile)         # read the midi file
     pygame.mixer.music.play()                  # play the music
     while pygame.mixer.music.get_busy():       # check if playback has finished
-        clock.tick(30)
+        clock.tick(100)
 
 
 if __name__ == '__main__':

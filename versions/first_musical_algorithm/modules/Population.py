@@ -9,13 +9,14 @@ from individual import Individual
 from helpers import crossover, generate_genotype, normalize, output_to_midi, play_midi
 from statistics import mean, stdev
 from chord import Chord
+import copy
 import random
 import math
 
 
 class Population:
     
-    def __init__(self,popSize:int, genotypeLength:int, maxNoteLength:int, pTransformMutation:float, pTimeMutation:float, pTransformCross:float, pTimeCross:float, fitnessEq:str, genPopulation:bool=False, loadFromGenotype=None, fitnessType:int=0, s=1.5, chord=Chord(), chords=[]):
+    def __init__(self,popSize:int, genotypeLength:int, maxNoteLength:int, pTransformMutation:float, pTimeMutation:float, pTransformCross:float, pTimeCross:float, fitnessEq:str, genPopulation:bool=False, loadFromGenotype=None, fitnessType:int=0, s=1.5, chord=Chord(), chords=[], midiChords=[], bestIndividuals=[]):
         
         # self._bitLength = bitLength # This can now change
 
@@ -35,11 +36,14 @@ class Population:
         self._s = s
         self._fitnessEq = fitnessEq
 
+        self.maxFitness = 0
         self._fitnessSum = float(0)
         self._fitnessWheel = []
 
         self._chord  = chord
         self._chords = chords
+        self._midiChords = midiChords
+        self._bestIndividuals = bestIndividuals
 
         self.population = []
 
@@ -70,7 +74,7 @@ class Population:
         self.evaluate_fitness()
     
 
-    def populate_Population(self, genotype, mutate=True, parent1=None, parent2=None):
+    def populate_Population(self, genotype, mutate=True, parent1=None, parent2=None, totalGenerations=100, currentGen=1):
         """
         Args:
             individual (_type_): _description_
@@ -80,11 +84,11 @@ class Population:
         """
         individual = Individual(genotype, self._pTransformMutation, self._pTimeMutation, (parent1,parent2))
         if mutate: individual.mutate()
-        individual.fitness = self.evaluate(individual)
+        individual.fitness = self.evaluate(individual, totalGenerations, currentGen)
 
         self.population.append(individual)
 
-    def evaluate(self, individual):
+    def evaluate(self, individual:Individual, totalGenerations, currentGen):
         """
         input: individual of type individual
         Evaluates fitness equation with normalized phenotype
@@ -96,9 +100,48 @@ class Population:
         #     globals(),
         #     {'z': normalize(individual.phenotype, (self._base**self._bitLength)-1)},
         # )
-        fitness = random.random() # temporary
+        # individual.transforms
+        # fitness = random.random() # temporary
+        self.maxFitness = 0
+
+
+        fitness = 0
+        currentSongProgress = (currentGen/totalGenerations)*100
+
+
+        simpleTransforms = Chord().test_fill(individual.transforms)
+
+        for index in range(len(individual.transforms)):
+
+            transform = simpleTransforms[index]
+            time       = individual.times[index]
+            seen       = []
+            
+            # print(individual.transforms[index])
+            
+            if indiv
+
+            if individual.transforms[index] not in seen:
+                fitness += 33
+                seen.append(individual.transforms[index])
+
+            var = min(((100*(currentSongProgress**2)) / ((1/20)*(currentSongProgress**3))) - 20, 67) 
+            # print(var)
+            if len(transform) > 1: fitness += var
+            else:
+                fitness += 67 - var
+
+            # print(individual.times)
+
+            if individual.times[index-1] + .1 > time > individual.times[index-1] - .1: 
+                fitness += 33;
+            # else: print(False)
+
+            self.maxFitness += 33 + 67 + 33
+
         self._fitnessSum += fitness
         return fitness
+
 
     def evaluate_fitness(self):
         """
@@ -137,21 +180,19 @@ class Population:
         count = 0
         self._chord.fill_operations(measure.transforms)
         for chord in self._chord.perform_operations():
-            self._chords.append((chord.as_midi(), measure.times[count]))
+            self._midiChords.append((chord.as_midi(), measure.times[count]))
+            self._chords.append(copy.deepcopy(chord))
             count += 1
-            # self._chords.append((chord.chord_string()))
-
-
-
-    def next_generation(self):
+        self._bestIndividuals.append(measure)
+    
+    def next_generation(self, totalGenerations, currentGen):
         """
         Creates new population
         Roulette Wheel then generates children of selected parents newPopulation
         return: class Population
         """
-        self.save_measure(self.population[-1])
 
-        newPopulation = Population(self._popSize, self._genotypeLength, self._maxNoteLength, self._pTransformMutation, self._pTimeMutation, self._pTransformCross, self._pTimeCross, self._fitnessEq, fitnessType=self._fitnessType, s=self._s, chord=self._chord, chords=self._chords)
+        newPopulation = Population(self._popSize, self._genotypeLength, self._maxNoteLength, self._pTransformMutation, self._pTimeMutation, self._pTransformCross, self._pTimeCross, self._fitnessEq, fitnessType=self._fitnessType, s=self._s, chord=self._chord, chords=self._chords, bestIndividuals=self._bestIndividuals)
 
         # Select Parents (roulette wheel)
         while len(newPopulation.population) < self._popSize:  # Fill new population
@@ -182,7 +223,7 @@ class Population:
                 children = (individual1.genotype, individual2.genotype)
             
             for child in children:
-                newPopulation.populate_Population(child, True, individual1, individual2)  # Adds each child to the population
+                newPopulation.populate_Population(child, True, individual1, individual2, totalGenerations, currentGen)  # Adds each child to the population
                 
         newPopulation.evaluate_fitness()
 
@@ -205,18 +246,20 @@ class Population:
 if __name__ == '__main__':
     # Basic test code, for more in depth testing use the test.py file
 
-    generations = 10
-    pop = Population(100, 4 ,1,0.25, 0.25, 0.5, 0.5, fitnessEq='z**10', genPopulation=True)
+    generations = 20
+    pop = Population(100, 4 ,1,0.25, 0.25, 0.5, 0.5, fitnessEq="z**10",fitnessType=2, s=1.5, genPopulation=True)
+    pop.save_measure(pop.population[-1])
+
     print(pop)
     genCount = 1
     while genCount < generations:
-        pop = pop.next_generation()
-        # print(pop)
+        pop = pop.next_generation(generations, genCount)
+        pop.save_measure(pop.population[-1])
+        print(pop)
         # print(pop._chords[-4:])
         genCount += 1
-    
-    
-    output_to_midi(pop.chords, "midi_file.mid")
+    print("maxFitness:", pop.maxFitness)
+    output_to_midi(pop._midiChords, "midi_file.mid")
     play_midi("midi_file.mid")
     
     
