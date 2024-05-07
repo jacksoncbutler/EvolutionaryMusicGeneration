@@ -51,17 +51,17 @@ def crossover(genotype1:list, genotype2:list):
 def get_translations():
     return {'R':'R', 'P':'P', 'L':'L', 'H':'PLR', 'S':'LPRP', 'N':'RLP', 'F':'PL', 'M':'RL'}
 
-def generate_genotype(length:int, maxFloat:int=4) -> list:
-    return [random_transformations_list(length), random_float_list(length, maxFloat)]
+def generate_genotype(length:int, timeRange:tuple) -> list:
+    return [random_transformations_list(length), random_float_list(length, timeRange)]
 
 
 def random_integer_list(length:int, base:int=9) -> list:
     # random.seed(42)
     return [random.randrange(0,base) for _ in range(length)]
 
-def random_float_list(length:int, max:int) -> list:
+def random_float_list(length:int, timeRange:tuple) -> list:
     # random.seed(42)
-    return [round(random.randrange(0,max*100) / 100, 1) for _ in range(length)]
+    return [round(random.randrange(*timeRange) / 100, 2) for _ in range(length)]
 
 def random_transformations_list(length:int) -> list:
     # random.seed(42)
@@ -89,8 +89,8 @@ def output_to_midi(chords, midiFile, apregiate=False):
         for note in chord:
             # print(note, end=", ")
             MyMIDI.addNote(track, channel, note, time, duration, volume)
-            time += .1
-        time += .5
+            # time += duration
+        time += duration
         # print()
 
     with open(midiFile, "wb") as output_file:

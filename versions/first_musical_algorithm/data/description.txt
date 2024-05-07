@@ -54,7 +54,7 @@ Current Ongoing Changes:
 Based on Key
 Tonics: I, VI, Vb, IIIb # prolong tonic or go to sub
 Subdominant: II, VII, VIb, IV # if sub go to sub or dom
-Dominant: VI, III, IIb, IIVb # if dom go to dom or tonic
+Dominant: IV, III, IIb, IIVb # if dom go to dom or tonic
 
    P   R       L
 T -> i -> IIIb -> iv

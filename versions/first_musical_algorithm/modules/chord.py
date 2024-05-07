@@ -4,14 +4,14 @@ from helpers import get_translations
 class Chord:
 
     num_to_chord = ['_', 'C', 'D','E','F','G','A','B']
-    tonics       = [(1, 'natural'), (3, 'flat'), (5, 'flat'), (6, 'natural')]
-    subDominant  = [(2, 'natural'), (4, 'natural'), (6, 'flat'), (7, 'natural')]
-    dominant     = [(2, 'flat'), (3, 'natural'), (6, 'natural'), (7, 'flat')]
+    tonics       = [0, 3, 6, 9]
+    subDominant  = [2, 5, 8, 11]
+    dominant     = [1, 4, 5, 10]
 
-    def __init__(self, notes:tuple=(1,3,5), flats:tuple=('natural', 'natural', 'natural'), mod:str='M'):
+    def __init__(self, notes:tuple=(0,4,7), mod:str='M'):
 
         self.operations = []
-        self.notes      = [Note(notes[0], flats[0]), Note(notes[1], flats[1]), Note(notes[2], flats[2])]
+        self.notes      = [Note(notes[0]), Note(notes[1]), Note(notes[2])]
         self.mod        = mod
 
     def fill_operations(self, transitions:list):
@@ -27,7 +27,7 @@ class Chord:
         # print('anything')
         # print(self.operations)
         while len(self.operations) > 0:
-            operations = self.operations.pop()
+            operations = self.operations.pop(0)
             # print(operations)
 
             for item in operations:
@@ -61,7 +61,7 @@ class Chord:
                     self.notes[num] = holdVar
         else:
             for num in range(len(self.notes)-1, -1, -1):
-                if num == 2:
+                if num == len(self.notes)-1:
                     holdVar = self.notes[num]
                 index = num + direction
                 if num != 0:
@@ -99,25 +99,24 @@ class Chord:
 
     @property
     def is_tonic(self):
-        return True if (self.notes[0].value, self.notes[0].mod) in Chord.tonics else False
+        return True if self.notes[0].pitch in Chord.tonics else False
 
     @property
     def is_subDominant(self):
-        return True if (self.notes[0].value, self.notes[0].mod) in Chord.subDominant else False
+        return True if self.notes[0].pitch in Chord.subDominant else False
     
     @property
     def is_dominant(self):
-        return True if (self.notes[0].value, self.notes[0].mod) in Chord.dominant else False
+        return True if self.notes[0].pitch in Chord.dominant else False
 
     def chord_string(self):
-        return f'{Chord.num_to_chord[self.notes[0].value]}{self.mod}'
+        return f'{Chord.num_to_chord[self.notes[0].pitch]}{self.mod}'
     
     def as_midi(self):
         return [note.as_midi() for note in self.notes]
 
-
     def __str__(self):
-        return f'{[str(note) for note in self.notes]}, {self.mod}, Chord: {self.chord_string()}'
+        return f'{[str(note) for note in self.notes]}, {self.mod}'
 
 
 

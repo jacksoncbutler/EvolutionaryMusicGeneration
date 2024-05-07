@@ -16,7 +16,7 @@ import math
 
 class Population:
     
-    def __init__(self,popSize:int, genotypeLength:int, maxNoteLength:int, pTransformMutation:float, pTimeMutation:float, pTransformCross:float, pTimeCross:float, fitnessEq:str, genPopulation:bool=False, loadFromGenotype=None, fitnessType:int=0, s=1.5, chord=Chord(), chords=[], midiChords=[], bestIndividuals=[]):
+    def __init__(self,popSize:int, genotypeLength:int, maxNoteLength:int, pTransformMutation:float, pTimeMutation:float, pTransformCross:float, pTimeCross:float, fitnessEq:str, timeMutationRange:tuple=(200, 401), genPopulation:bool=False, loadFromGenotype=None, fitnessType:int=0, s=1.5, chord=Chord(), chords=[], midiChords=[], bestIndividuals=[]):
         
         # self._bitLength = bitLength # This can now change
 
@@ -28,6 +28,7 @@ class Population:
 
         self._pTransformMutation = pTransformMutation
         self._pTimeMutation = pTimeMutation
+        self._timeMutationRange = timeMutationRange
 
         self._pTransformCross = pTransformCross
         self._pTimeCross = pTimeCross
@@ -70,7 +71,7 @@ class Population:
         else:
 
             for _ in range(self._popSize):  
-                self.populate_Population(generate_genotype(self._genotypeLength, self._maxNoteLength), mutate=False)
+                self.populate_Population(generate_genotype(self._genotypeLength, self._timeMutationRange), mutate=False)
         self.evaluate_fitness()
     
 
@@ -83,7 +84,7 @@ class Population:
             parent2 (_type_, optional): _description_. Defaults to None.
         """
         individual = Individual(genotype, self._pTransformMutation, self._pTimeMutation, (parent1,parent2))
-        if mutate: individual.mutate()
+        if mutate: individual.mutate(self._timeMutationRange)
         individual.fitness = self.evaluate(individual, totalGenerations, currentGen)
 
         self.population.append(individual)
@@ -102,44 +103,71 @@ class Population:
         # )
         # individual.transforms
         # fitness = random.random() # temporary
+
+        # individual._genotype = [['N','S','R','S'], [1,1,1,1]]
         self.maxFitness = 0
-
-
         fitness = 0
+
+        prevChord = copy.deepcopy(self._chord)
+        testChord = copy.deepcopy(prevChord)
+        prevChord:Chord
+        testChord:Chord
+        if len(self._midiChords) > 0:
+            prevTime = self._midiChords[-1][1]
+        else: prevTime = 0
+
+
+        
         currentSongProgress = (currentGen/totalGenerations)*100
-
-
         simpleTransforms = Chord().test_fill(individual.transforms)
 
-        for index in range(len(individual.transforms)):
+        testChord.fill_operations(individual.transforms)
+        chords = []
+        for chord in testChord.perform_operations():
+            chords.append(copy.deepcopy(chord))
 
-            transform = simpleTransforms[index]
-            time       = individual.times[index]
-            seen       = []
+
+        for index in range(len(individual.transforms)):
+            transform     = simpleTransforms[index]
+            currentChord  = chords[index]
+            currentChord:Chord
+            time          = individual.times[index]
             
             # print(individual.transforms[index])
             
-            if indiv
+            if prevChord.is_tonic:
+                if currentChord.is_tonic or currentChord.is_subDominant:
+                    fitness += 100
+            elif prevChord.is_subDominant:
+                if currentChord.is_subDominant or currentChord.is_tonic:
+                    fitness += 100
+            elif prevChord.is_dominant:
+                if currentChord.is_dominant or currentChord.is_tonic:
+                    fitness += 100       
 
-            if individual.transforms[index] not in seen:
-                fitness += 33
-                seen.append(individual.transforms[index])
+            if str(individual.transforms[index]) in [*individual.transforms[:index], *individual.transforms[index+1:]]:
+                fitness -= 50
 
-            var = min(((100*(currentSongProgress**2)) / ((1/20)*(currentSongProgress**3))) - 20, 67) 
-            # print(var)
-            if len(transform) > 1: fitness += var
-            else:
-                fitness += 67 - var
+            # var = min(((100*(currentSongProgress**2)) / ((1/20)*(currentSongProgress**3))) - 20, 33) 
+            # # print(var)
+            # if len(transform) > 1: fitness += 15
+            # else:
+            #     fitness += 33 - var
 
             # print(individual.times)
 
-            if individual.times[index-1] + .1 > time > individual.times[index-1] - .1: 
-                fitness += 33;
+            if time%0.25 == 0: 
+                fitness += 30;
             # else: print(False)
 
-            self.maxFitness += 33 + 67 + 33
+            self.maxFitness +=  100 + 30
+
+            prevChord = currentChord
+            prevTime = time
+        
 
         self._fitnessSum += fitness
+
         return fitness
 
 
@@ -224,7 +252,7 @@ class Population:
             
             for child in children:
                 newPopulation.populate_Population(child, True, individual1, individual2, totalGenerations, currentGen)  # Adds each child to the population
-                
+        
         newPopulation.evaluate_fitness()
 
         return newPopulation
@@ -246,8 +274,8 @@ class Population:
 if __name__ == '__main__':
     # Basic test code, for more in depth testing use the test.py file
 
-    generations = 20
-    pop = Population(100, 4 ,1,0.25, 0.25, 0.5, 0.5, fitnessEq="z**10",fitnessType=2, s=1.5, genPopulation=True)
+    generations = 10
+    pop = Population(1000, 4 ,1,0.25, 0.25, 0.5, 0.5, fitnessEq="z**10",fitnessType=2, s=1.5, genPopulation=True)
     pop.save_measure(pop.population[-1])
 
     print(pop)
@@ -256,7 +284,7 @@ if __name__ == '__main__':
         pop = pop.next_generation(generations, genCount)
         pop.save_measure(pop.population[-1])
         print(pop)
-        # print(pop._chords[-4:])
+        # print([str(chord) for chord in pop._chords[-4:]])
         genCount += 1
     print("maxFitness:", pop.maxFitness)
     output_to_midi(pop._midiChords, "midi_file.mid")

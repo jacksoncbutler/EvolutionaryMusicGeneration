@@ -45,7 +45,7 @@ class Individual:
         """
         return self._genotype[1]
     
-    def mutate(self):  # need to rewrite this to accomadate for new list Genotype
+    def mutate(self, timeMutationRange:tuple):  # need to rewrite this to accomadate for new list Genotype
         """
         Tries to mutate each bit in genotype
         This method only runs on creation of Individual
@@ -56,7 +56,7 @@ class Individual:
         genotypeTransformation  = [random.choice(possibleTransformations) if random.random() <= self._pTransformMutation else self._genotype[0][i] for i in range(len(self._genotype[0]))]
 
         # Need to do something about this INTEGER or FLOAT
-        genotypeTime            = [random.randrange(0,100)/100 if random.random() <= self._pTimeMutation else self._genotype[1][i] for i in range(len(self._genotype[1]))]
+        genotypeTime            = [random.randrange(*timeMutationRange)/100 if random.random() <= self._pTimeMutation else self._genotype[1][i] for i in range(len(self._genotype[1]))]
 
         self._genotype[0] = genotypeTransformation
         self._genotype[1] = genotypeTime
