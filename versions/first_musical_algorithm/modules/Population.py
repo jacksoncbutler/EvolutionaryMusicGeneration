@@ -5,8 +5,9 @@ Contains a class for the population of a genetic algorithm
 '''
 
 
-from individual import Individual
-from helpers import crossover, generate_genotype, normalize, output_to_midi, play_midi
+from chordIndividual import chordIndividual
+from melodyIndividual import melodyIndividual
+from helpers import crossover, generate_chord_genotype, generate_melody_genotype, normalize, output_to_midi, play_midi
 from statistics import mean, stdev
 from chord import Chord
 import copy
@@ -16,7 +17,24 @@ import math
 
 class Population:
     
-    def __init__(self,popSize:int, genotypeLength:int, maxNoteLength:int, pTransformMutation:float, pTimeMutation:float, pTransformCross:float, pTimeCross:float, fitnessEq:str, timeMutationRange:tuple=(200, 401), genPopulation:bool=False, loadFromGenotype=None, fitnessType:int=0, s=1.5, chord=Chord(), chords=[], midiChords=[], bestIndividuals=[]):
+    def __init__(self,popSize:int, 
+                 genotypeLength:int, 
+                 maxNoteLength:int, 
+                 pTransformMutation:float, 
+                 pNoteTransformMutation:float,
+                 pTimeMutation:float, 
+                 pTransformCross:float, 
+                 pTimeCross:float, 
+                 timeMutationRange:tuple=(200, 401), 
+                 isMelody:bool=False,
+                 genPopulation:bool=False, 
+                 loadFromGenotype=None, 
+                 fitnessType:int=0, 
+                 s=1.5, 
+                 chord=Chord(), 
+                 chords=[], 
+                 midiChords=[], 
+                 bestIndividuals=[]):
         
         # self._bitLength = bitLength # This can now change
 
@@ -27,6 +45,7 @@ class Population:
 
 
         self._pTransformMutation = pTransformMutation
+        self._pNoteTransformMutation = pNoteTransformMutation
         self._pTimeMutation = pTimeMutation
         self._timeMutationRange = timeMutationRange
 
@@ -35,12 +54,12 @@ class Population:
 
         self._fitnessType = fitnessType
         self._s = s
-        self._fitnessEq = fitnessEq
 
         self.maxFitness = 0
         self._fitnessSum = float(0)
         self._fitnessWheel = []
 
+        self._isMelody = isMelody
         self._chord  = chord
         self._chords = chords
         self._midiChords = midiChords
@@ -70,8 +89,11 @@ class Population:
 
         else:
 
-            for _ in range(self._popSize):  
-                self.populate_Population(generate_genotype(self._genotypeLength, self._timeMutationRange), mutate=False)
+            for _ in range(self._popSize):
+                # if self._isMelody:
+                #     self.populate_Population(generate_melody_genotype(random.randrange(4,9),self._genotypeLength, self._timeMutationRange), mutate=False)
+                # else:
+                self.populate_Population(generate_chord_genotype(self._genotypeLength, self._timeMutationRange), mutate=False)
         self.evaluate_fitness()
     
 
@@ -83,13 +105,16 @@ class Population:
             parent1 (_type_, optional): _description_. Defaults to None.
             parent2 (_type_, optional): _description_. Defaults to None.
         """
-        individual = Individual(genotype, self._pTransformMutation, self._pTimeMutation, (parent1,parent2))
+        # if self._isMelody:
+        #     individual = melodyIndividual(genotype, self._pTransformMutation, self._pTimeMutation, (parent1,parent2))
+        # else:
+        individual = chordIndividual(genotype, self._pTransformMutation, self._pNoteTransformMutation, self._pTimeMutation, (parent1,parent2))
         if mutate: individual.mutate(self._timeMutationRange)
         individual.fitness = self.evaluate(individual, totalGenerations, currentGen)
 
         self.population.append(individual)
 
-    def evaluate(self, individual:Individual, totalGenerations, currentGen):
+    def evaluate(self, individual:chordIndividual|melodyIndividual, totalGenerations, currentGen):
         """
         input: individual of type individual
         Evaluates fitness equation with normalized phenotype
@@ -119,16 +144,20 @@ class Population:
 
         
         currentSongProgress = (currentGen/totalGenerations)*100
-        simpleTransforms = Chord().test_fill(individual.transforms)
+        simpleTransforms = Chord().test_fill(individual.transforms, self._isMelody)
+        # print(self._isMelody)
+        # print(individual.transforms)
+        # print(simpleTransforms)
 
-        testChord.fill_operations(individual.transforms)
+        testChord.fill_operations(individual.transforms, self._isMelody)
         chords = []
-        for chord in testChord.perform_operations():
+        for chord in testChord.perform_operations(self._isMelody):
             chords.append(copy.deepcopy(chord))
 
 
-        for index in range(len(individual.transforms)):
+        for index in range(len(individual.transforms,)):
             transform     = simpleTransforms[index]
+            # print(chords)
             currentChord  = chords[index]
             currentChord:Chord
             time          = individual.times[index]
@@ -145,8 +174,8 @@ class Population:
                 if currentChord.is_dominant or currentChord.is_tonic:
                     fitness += 100       
 
-            if str(individual.transforms[index]) in [*individual.transforms[:index], *individual.transforms[index+1:]]:
-                fitness -= 50
+            # if str(individual.transforms[index]) in [*individual.transforms[:index], *individual.transforms[index+1:]]:
+            #     fitness -= 50
 
             # var = min(((100*(currentSongProgress**2)) / ((1/20)*(currentSongProgress**3))) - 20, 33) 
             # # print(var)
@@ -156,7 +185,7 @@ class Population:
 
             # print(individual.times)
 
-            if time%0.25 == 0: 
+            if time%0.125 == 0: 
                 fitness += 30;
             # else: print(False)
 
@@ -175,6 +204,7 @@ class Population:
         """
         Creates roulette wheel
         """
+        
         normalizedSum = 0
         self.population.sort(key=lambda x:x.fitness) # Not required, just for nice looking output.
         
@@ -206,8 +236,8 @@ class Population:
 
     def save_measure(self, measure):
         count = 0
-        self._chord.fill_operations(measure.transforms)
-        for chord in self._chord.perform_operations():
+        self._chord.fill_operations(measure.transforms, self._isMelody)
+        for chord in self._chord.perform_operations(self._isMelody):
             self._midiChords.append((chord.as_midi(), measure.times[count]))
             self._chords.append(copy.deepcopy(chord))
             count += 1
@@ -220,7 +250,7 @@ class Population:
         return: class Population
         """
 
-        newPopulation = Population(self._popSize, self._genotypeLength, self._maxNoteLength, self._pTransformMutation, self._pTimeMutation, self._pTransformCross, self._pTimeCross, self._fitnessEq, fitnessType=self._fitnessType, s=self._s, chord=self._chord, chords=self._chords, bestIndividuals=self._bestIndividuals)
+        newPopulation = Population(self._popSize, self._genotypeLength, self._maxNoteLength, self._pTransformMutation, self._pNoteTransformMutation, self._pTimeMutation, self._pTransformCross, self._pTimeCross, isMelody=self._isMelody, fitnessType=self._fitnessType, s=self._s, chord=self._chord, chords=self._chords, bestIndividuals=self._bestIndividuals)
 
         # Select Parents (roulette wheel)
         while len(newPopulation.population) < self._popSize:  # Fill new population
@@ -236,11 +266,11 @@ class Population:
             for index in range(len(self._fitnessWheel)):  # Iterates through fitness wheel ranges
                 fitnessValue = self._fitnessWheel[index]
 
-                if not isinstance(individual1, Individual):  # Check if individual is not a member of a class
+                if not isinstance(individual1, chordIndividual):  # Check if individual is not a member of a class
                     if individual1 <= fitnessValue:  # Check if random value is within current fitness range
                         individual1 = self.population[index]
 
-                if not isinstance(individual2, Individual):  # Check if individual is not a member of a class
+                if not isinstance(individual2, chordIndividual):  # Check if individual is not a member of a class
 
                     if individual2 <= fitnessValue:  # Check if random value is within current fitness range
                         individual2 = self.population[index]
@@ -275,19 +305,25 @@ if __name__ == '__main__':
     # Basic test code, for more in depth testing use the test.py file
 
     generations = 10
-    pop = Population(1000, 4 ,1,0.25, 0.25, 0.5, 0.5, fitnessEq="z**10",fitnessType=2, s=1.5, genPopulation=True)
-    pop.save_measure(pop.population[-1])
+    chordsPop = Population(200, 4 ,1,0.33, 0.7, 0.5, 0.5, 0.5,fitnessType=0, s=1.5, genPopulation=True)
+    chordsPop.save_measure(chordsPop.population[-1])
 
-    print(pop)
+    melodyPop = Population(1000, 4 ,1,0.33, 0.7, 0.5, 0.5, 0.5,fitnessType=2, s=1.5, genPopulation=True, isMelody=True)
+
+    print(chordsPop)
+    print(melodyPop)
+
     genCount = 1
     while genCount < generations:
-        pop = pop.next_generation(generations, genCount)
-        pop.save_measure(pop.population[-1])
-        print(pop)
+        chordsPop = chordsPop.next_generation(generations, genCount)
+        chordsPop.save_measure(chordsPop.population[-1])
+        print('chords:',chordsPop)
+        print('Melody:',melodyPop)
+
         # print([str(chord) for chord in pop._chords[-4:]])
         genCount += 1
-    print("maxFitness:", pop.maxFitness)
-    output_to_midi(pop._midiChords, "midi_file.mid")
+    print("maxFitness:", chordsPop.maxFitness)
+    output_to_midi(chordsPop._midiChords, melodyPop._midiChords, "midi_file.mid")
     play_midi("midi_file.mid")
     
     

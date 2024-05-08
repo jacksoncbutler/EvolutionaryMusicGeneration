@@ -14,16 +14,33 @@ class Chord:
         self.notes      = [Note(notes[0]), Note(notes[1]), Note(notes[2])]
         self.mod        = mod
 
-    def fill_operations(self, transitions:list):
+    def fill_operations(self, transitions:list, ismelody:bool):
         # print(transitions)
+        temp = []
+        # if ismelody:
+        #     for actualTransistions in transitions:
+        #         temp = [get_translations()[item] for item in actualTransistions]
+        #         print(temp)
+        #         # self.operations.append([i for i in ])
+        # else:
         for item in transitions:
-            # print(item)
             self.operations.append([i for i in get_translations()[item]])
 
-    def test_fill(self, transitions:list):
-        return [[i for i in get_translations()[item]] for item in transitions]
+    def test_fill(self, transitions:list, ismelody:bool):
+        # print(ismelody)
+        # if ismelody:
+        #     returnChar = []
+        #     print(transitions)
+        #     for actualTransitions in transitions:
+        #         print(actualTransitions)
+        #         # returnChar.append()
+        #         returnChar = [[i for i in get_translations()[item]] for item in actualTransitions]
+        # else:
+        returnChar = [[i for i in get_translations()[item]] for item in transitions]
+        
+        return returnChar
     
-    def perform_operations(self):
+    def perform_operations(self, ismelody):
         # print('anything')
         # print(self.operations)
         while len(self.operations) > 0:
