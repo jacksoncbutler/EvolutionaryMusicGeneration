@@ -63,6 +63,7 @@ def random_integer_list(length:int, base:int=9) -> list:
 
 def random_float_list(length:int, timeRange:tuple) -> list:
     # random.seed(42)
+    print(timeRange)
     return [round(random.randrange(*timeRange) / 100, 2) for _ in range(length)]
 
 def random_transformations_list(length:int) -> list:
@@ -126,7 +127,7 @@ def output_to_midi(chords, melodies, midiFile, apregiate=False):
             # print('melodyDuration', melodyDuration, normalizedMelodyDuration, )
             for note in melodyInfo[0]:
             # note = melodyInfo[0][0]
-                MyMIDI.addNote(track, channel, note, melodyTime, normalizedMelodyDuration/3, volume)
+                MyMIDI.addNote(track, channel, note, melodyTime, 0.05+normalizedMelodyDuration/3, volume)
 
                 melodyTime += normalizedMelodyDuration/3
         

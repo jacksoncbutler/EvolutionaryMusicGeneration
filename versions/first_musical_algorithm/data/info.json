@@ -1,25 +1,20 @@
 {
     "inputs": {
-        "base":"int",
-        "bitLength":"int",
-        
-        "popSize":"int",
-        "pMutation":"float",
-        "pCross":"float",
-        "noOfCrossPoints":"int",
-        "fitnessEq":"str",
-        "fitnessType":"int",
-        "s":"float",
-        "generations":"int",
-        "runs":"int",
-        "curRun":"int",
-        "curGeneration":"int"
+        "popSize":"int", 
+        "genotypeLength":"int", 
+        "pTransformMutation":"float", 
+        "pNoteTransformMutation":"float",
+        "pTimeMutation":"float", 
+        "pTransformCross":"float", 
+        "pTimeCross":"float", 
+        "timeMutationRange":"list",
+        "isMelody":"bool",
+        "fitnessType":"int", 
+        "s":"float" 
     },
     "outputs": [
         "Gen",
         "Best Genotype",
-        "Phenotype",
-        "Normal Phenotype",
         "Best Fitness",
         "Worst Genotype",
         "Worst Fitness",

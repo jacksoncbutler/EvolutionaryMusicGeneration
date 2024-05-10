@@ -28,7 +28,14 @@ class ProjectUi(CTkFrame):
         
         sys.path.append(self.workingDir)
         import main
-        
+        from modules.helpers import play_midi, output_to_midi
+
+        self.play_midi = play_midi
+        self.output_to_midi = output_to_midi
+        self._playing = False
+        self.musicFileDir = f"midi_file.mid"
+        self.exampleMidiDir = f"{self.workingDir}/{self.__root.dataFolder}/midi_file.mid"
+
         self._project = main.Main()
         self._running = False
         self._active = False
@@ -66,7 +73,7 @@ class ProjectUi(CTkFrame):
         # Visualize Params
         self._paramContainer = CTkFrame(self)
         self._paramContainer.configure(corner_radius=5)
-        self._paramContainer.grid(row = 1, column = 5, rowspan=5, padx=20,pady=20, sticky=N+E+S+W)
+        self._paramContainer.grid(row = 1, column = 5, rowspan=4, padx=20,pady=20, sticky=N+E+S+W)
         # _paramContainer.pack(side=TOP, fill=BOTH, expand = True)
         self._paramContainer.grid_columnconfigure(0, weight=0)
         self._paramContainer.grid_columnconfigure(1, weight=0)
@@ -85,7 +92,18 @@ class ProjectUi(CTkFrame):
             self._paramEntries[key] = entry
 
             count+=1
-            
+        
+        self._musicPlayerContainer = CTkFrame(self)
+        self._musicPlayerContainer.configure(corner_radius=5)
+        self._musicPlayerContainer.grid(row = 5, column = 5, sticky=N+E+S+W)
+        self._musicPlayerContainer.grid_rowconfigure(1, weight=1)
+        self._musicPlayerContainer.grid_columnconfigure(1, weight=1)
+        self._musicPlayerContainer.grid_columnconfigure(2, weight=1)
+        self._musicPlayerContainer.grid_columnconfigure(3, weight=1)
+
+        self._playMusic = CTkButton(self._musicPlayerContainer, text="Play", command=lambda : self.play_midi(self.musicFileDir), corner_radius=1, height=15)
+        self._playMusic.grid(row=0, column=2, sticky=N+E+S+W, pady=0)
+
         # Run Save File Path
         # self._paramContainer.grid_rowconfigure(count, weight=0)
 
@@ -131,7 +149,7 @@ class ProjectUi(CTkFrame):
         self._stopButton.grid_forget()
         self._runButton = CTkButton(self, text="Run", command=lambda : self._run_toggle(), corner_radius=1, height=10)
         self._runButton.grid(row=6, column=5, sticky=E+W, pady=10)
-        
+
     def _save_run_check(self):
         print("checkbox toggled, current value:", self.saveRun.get())
     
@@ -184,6 +202,10 @@ class ProjectUi(CTkFrame):
             elif isinstance(value, str):
                 entry = str(entry)
             elif isinstance(value, list):
+                print(value)
+                entry = str(value).strip(' ').split(',')
+            elif isinstance(value, tuple):
+                print(value)
                 entry = str(value).strip(' ').split(',')
             self._params[key] = entry
             count+= 1
@@ -228,6 +250,9 @@ class ProjectUi(CTkFrame):
         
         if self._running:
             self._run_toggle()
+        
+        self.output_to_midi(gen_info._midiChords, gen_info._midiChords, self.musicFileDir)
+        
     
     def _on_text_box_hover(self, e):
         self._outputBox.configure(scrollbar_button_color=self.__root.SCROLL_COLOUR)

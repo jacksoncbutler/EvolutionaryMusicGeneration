@@ -1,5 +1,5 @@
-from note import Note
-from helpers import get_translations
+from .note import Note
+from .helpers import get_translations
 
 class Chord:
 

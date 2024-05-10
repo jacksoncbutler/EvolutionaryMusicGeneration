@@ -5,11 +5,11 @@ Contains a class for the population of a genetic algorithm
 '''
 
 
-from chordIndividual import chordIndividual
-from melodyIndividual import melodyIndividual
-from helpers import crossover, generate_chord_genotype, normalize, output_to_midi, play_midi
+from .chordIndividual import chordIndividual
+from .melodyIndividual import melodyIndividual
+from .helpers import crossover, generate_chord_genotype, normalize, output_to_midi, play_midi
 from statistics import mean, stdev
-from chord import Chord
+from .chord import Chord
 import copy
 import random
 import math
@@ -19,14 +19,13 @@ class Population:
     
     def __init__(self,popSize:int, 
                  genotypeLength:int, 
-                 maxNoteLength:int, 
                  pTransformMutation:float, 
                  pNoteTransformMutation:float,
                  pTimeMutation:float, 
                  pTransformCross:float, 
                  pTimeCross:float, 
                  bestChord=None,
-                 timeMutationRange:tuple=(200, 401), 
+                 timeMutationRange:tuple=(200, 301), 
                  isMelody:bool=False,
                  genPopulation:bool=False, 
                  loadFromGenotype=None, 
@@ -42,7 +41,6 @@ class Population:
         self._popSize = popSize
 
         self._genotypeLength = genotypeLength
-        self._maxNoteLength  = maxNoteLength
 
 
         self._pTransformMutation = pTransformMutation
@@ -72,6 +70,7 @@ class Population:
         # Generates a population of popSize length if genPopulation
         if genPopulation or isinstance(loadFromGenotype, list): self.gen_population(loadFromGenotype, bestChord)
             
+    
     
     def __str__(self):
         """
@@ -262,7 +261,7 @@ class Population:
         return: class Population
         """
 
-        newPopulation = Population(self._popSize, self._genotypeLength, self._maxNoteLength, self._pTransformMutation, self._pNoteTransformMutation, self._pTimeMutation, self._pTransformCross, self._pTimeCross, bestChord=bestChord, isMelody=self._isMelody, fitnessType=self._fitnessType, s=self._s, chord=self._chord, chords=self._chords, bestIndividuals=self._bestIndividuals)
+        newPopulation = Population(self._popSize, self._genotypeLength, self._pTransformMutation, self._pNoteTransformMutation, self._pTimeMutation, self._pTransformCross, self._pTimeCross, bestChord=bestChord, isMelody=self._isMelody, fitnessType=self._fitnessType, s=self._s, chord=self._chord, chords=self._chords, bestIndividuals=self._bestIndividuals)
 
         # Select Parents (roulette wheel)
         while len(newPopulation.population) < self._popSize:  # Fill new population
@@ -306,6 +305,13 @@ class Population:
         return: list
         """
         return (self.population[-1].genotype, self.population[-1].fitness, self.population[0].genotype, self.population[0].fitness)
+    
+    @property
+    def genotypes(self):
+        genotypes = []
+        for individual in self.population:
+            genotypes.append(individual.genotype)
+        return genotypes
 
     @property
     def chords(self):

@@ -1,0 +1,17 @@
+{
+    "popSize": 20,
+    "genotypeLength": 4,
+    "pTransformMutation": 0.5,
+    "pNoteTransformMutation": 0.5,
+    "pTimeMutation": 0.5,
+    "pTransformCross": 0.5,
+    "pTimeCross": 0.5,
+    "timeMutationRange": "200 301",
+    "isMelody": 0,
+    "fitnessType": 0,
+    "s": 1.5,
+    "generations": 30,
+    "runs": 1,
+    "curRun": 1,
+    "curGeneration": 0
+}

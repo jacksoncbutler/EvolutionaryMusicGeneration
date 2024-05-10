@@ -6,7 +6,7 @@ Contains a class for the individual of a population
 
 
 import random
-from helpers import get_translations, generate_chord_genotype, crossover
+from .helpers import get_translations, generate_chord_genotype, crossover
 import copy
 
 class chordIndividual:
