@@ -50,7 +50,7 @@ Current Ongoing Changes:
 
 - Not much of this can be done until all required inputs have been decided...
 
-
+Chords
 Based on Key
 Tonics: I, VI, Vb, IIIb # prolong tonic or go to sub
 Subdominant: II, VII, VIb, IV # if sub go to sub or dom
@@ -58,3 +58,9 @@ Dominant: IV, III, IIb, IIVb # if dom go to dom or tonic
 
    P   R       L
 T -> i -> IIIb -> iv
+
+Melody
+attach scale to every chord
+weights for retrograde (intervals are flipped)
+twice the length 
+half the length

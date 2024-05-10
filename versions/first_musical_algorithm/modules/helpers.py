@@ -77,42 +77,65 @@ def normalize(number:int, total):
 
 def output_to_midi(chords, melodies, midiFile, apregiate=False):
     # degrees  = [60, 62, 64, 65, 67, 69, 71, 72] # MIDI note number
+    # print(chords[:4])
+    # print(melodies[:4])
+
+
+
     track      = 0
     channel    = 0
     chordTime  = 0   # In beats
     melodyTime = 0
 
-    tempo      = 90  # In BPM
-    volume     = 100 # 0-127, as per the MIDI standard
+    allChordsIndex = 0
+    indexCount     = 0
 
-    MyMIDI = MIDIFile(1) # One track, defaults to format 1 (tempo track
+    tempo      = 90  # In BPM
+    volume     = 100 # 0-127, as per the MIDI standard  
+
+    MyMIDI = MIDIFile(2) # One track, defaults to format 1 (tempo track
                         # automatically created)
 
-    MyMIDI.addTempo(track, chordTime, tempo)
+    MyMIDI.addTempo(0, chordTime, tempo) 
+
 
     for index in range(len(chords)):
-        chord          = chords[index][0]
-        chordDuration  = chords[index][1]
-        melody         = melodies[index][0]
-        melodyDuration = melodies[index][1]
+        indexedChords   = chords[index]
+        indexedMelody   = melodies[index]
+        currentIndexChordDuration = 0
+
+        # print('indexedChords',indexedChords)
+        for chordInfo in indexedChords:
+            chordDuration = chordInfo[1]
+            for note in chordInfo[0]:
+                MyMIDI.addNote(track, channel, note, chordTime, chordDuration, volume)
+                pass
+            # print(melodyTime)
+            # print(chordTime)
+
+            chordTime += chordDuration
+            currentIndexChordDuration += chordDuration
         
+        # print('indexedMelody',melody)
+        # print (melody)
+        chordDuration
+        melodyDurationSum = sum([dur[1] for dur in indexedMelody])
+        for melodyInfo in indexedMelody:
+            melodyDuration = melodyInfo[1]
+            normalizedMelodyDuration = normalize(melodyDuration, melodyDurationSum) * currentIndexChordDuration
+            # print('melodyDuration', melodyDuration, normalizedMelodyDuration, )
+            for note in melodyInfo[0]:
+            # note = melodyInfo[0][0]
+                MyMIDI.addNote(track, channel, note, melodyTime, normalizedMelodyDuration/3, volume)
 
-        for note in chord:
-            # print(note, end=", ")
-            # print('chord:', chord)
-            # print('chordDur:', chordDuration)
-            MyMIDI.addNote(track, channel, note, chordTime, chordDuration, volume)
-        chordTime += chordDuration
-
-        # chordTime += chordDuration
+                melodyTime += normalizedMelodyDuration/3
         
-        for note in melody:
-            # print('note:', note, melodyTime)
-            MyMIDI.addNote(track, channel, note, melodyTime, melodyDuration, volume)
-
-            melodyTime += melodyDuration/3
+        # indexCount += 1
+        # print(allChords)
+        # print('indexed chords',allChords[allChordsIndex])
+        # if indexCount % len(allChords[allChordsIndex].transforms) == 0:
             
-        
+        #     indexCount = 0
 
     with open(midiFile, "wb") as output_file:
         MyMIDI.writeFile(output_file)

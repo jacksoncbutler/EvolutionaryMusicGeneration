@@ -3,10 +3,10 @@ from helpers import get_translations
 
 class Chord:
 
-    num_to_chord = ['_', 'C', 'D','E','F','G','A','B']
-    tonics       = [0, 3, 6, 9]
+    tonics       = [0, 3, 4, 6, 9]
     subDominant  = [2, 5, 8, 11]
-    dominant     = [1, 4, 5, 10]
+    dominant     = [1, 5, 10]
+                    
 
     def __init__(self, notes:tuple=(0,4,7), mod:str='M'):
 
@@ -125,16 +125,12 @@ class Chord:
     @property
     def is_dominant(self):
         return True if self.notes[0].pitch in Chord.dominant else False
-
-    def chord_string(self):
-        return f'{Chord.num_to_chord[self.notes[0].pitch]}{self.mod}'
     
     def as_midi(self):
         return [note.as_midi() for note in self.notes]
 
     def __str__(self):
         return f'{[str(note) for note in self.notes]}, {self.mod}'
-
 
 
 if __name__ == '__main__':

@@ -60,25 +60,25 @@ class chordIndividual:
         genotypeTime            = [random.randrange(*timeMutationRange)/100 if random.random() <= self._pTimeMutation else self._genotype[1][i] for i in range(len(self._genotype[1]))]
 
 
-        if self._isMelody:
-            middleTransform = []
-            middleTime = []
-            if random.random() <= 0.5:
-                for index in range(len(genotypeTransformation)):
-                    if random.random() <= self._pNoteTransformMutation:
-                        middleTransform.append(random.choice(possibleTransformations))
-                        middleTime.append(random.randrange(*timeMutationRange)/100)
+        # if self._isMelody:
+        #     middleTransform = []
+        #     middleTime = []
+        #     if random.random() <= 0.5:
+        #         for index in range(len(genotypeTransformation)):
+        #             if random.random() <= self._pNoteTransformMutation:
+        #                 middleTransform.append(random.choice(possibleTransformations))
+        #                 middleTime.append(random.randrange(*timeMutationRange)/100)
 
-                    middleTransform.append(genotypeTransformation[index])
-                    middleTime.append(genotypeTransformation[index])
-            else:
-                for index in range(len(genotypeTransformation)):
-                    if random.random() > self._pNoteTransformMutation:
-                        middleTransform.append(genotypeTransformation[index])
-                        middleTime.append(genotypeTransformation[index])
+        #             middleTransform.append(genotypeTransformation[index])
+        #             middleTime.append(genotypeTransformation[index])
+        #     else:
+        #         for index in range(len(genotypeTransformation)):
+        #             if random.random() > self._pNoteTransformMutation:
+        #                 middleTransform.append(genotypeTransformation[index])
+        #                 middleTime.append(genotypeTransformation[index])
             
-            genotypeTransformation = middleTransform
-            genotypeTime = middleTime
+        #     genotypeTransformation = middleTransform
+        #     genotypeTime = middleTime
 
             
         # Need to do something about this INTEGER or FLOAT
